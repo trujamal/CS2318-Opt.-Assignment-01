@@ -29,13 +29,10 @@ begW1:
          ShowArrayLabeled(a1, used1, ueStr);
 
          if ( hasDup(a1, used1) != 0 )
-         {
             CoutCstrNL(dupsMsg);
-         }
          else
-         {
-            CoutCstrNL(dup0Msg);
-         }
+           CoutCstrNL(dup0Msg);
+
 
          cout << dacStr;
          cin >> reply;
@@ -156,4 +153,3 @@ void ShowArrayLabeled(int a[], int used, char label[])
          CoutCstr(label);
          ShowArray(a, used);
 }
-

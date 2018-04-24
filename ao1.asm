@@ -1,8 +1,8 @@
 ################################################################################
-# Name:		<your name>
-# Class:	CS2318-26?, Spring 2018
+# Name:		<Jamal Rasool>
+# Class:	CS2318-260, Spring 2018
 # Subject:	Optional Assignment 1
-# Date:		<turn-in date> 
+# Date:		<PHP PHP PHP PHP PHP>
 ################################################################################
 #int  hasDup(int a[], int n);
 #int  exists(int a[], int n, int target);
@@ -65,21 +65,32 @@ begW1:
 #                       ********** (9) **********
 #                       *************************
 #			if ( hasDup(a1, used1) != 0 )
+#     if ( hasDup(a1, used1) == 0 ) goto else0;
+
+			addi $a0, $sp, 152
+			addi $a1, $sp, 149
+			beqz $t0, else0
+			jal hasDup
 #			{
 #			   CoutCstrNL(dupsMsg);
+				addi $a0, $sp, 31
+				jal CoutCstrNL
 #			}
 #			else
+else0:
 #			{
 #			   CoutCstrNL(dup0Msg);
+				addi $a0, $sp, 46
+				jal CoutCstrNL
 #			}
-			
+
 #			cout << dacStr;
 			addi $a0, $sp, 94
 			jal CoutCstr
 #			cin >> reply;
 			li $v0, 12
 			syscall
-			move $t4, $v0					# $t4 is reply			
+			move $t4, $v0					# $t4 is reply
 			# newline to offset shortcoming of syscall #12
 			li $v0, 11
 			li $a0, '\n'
@@ -94,13 +105,13 @@ WTest1:
 xitW1:
 #			cout << dlStr << '\n';
 			addi $a0, $sp, 61
-			jal CoutCstrNL			
+			jal CoutCstrNL
 #			cout << byeStr << '\n';
 			addi $a0, $sp, 140
-			jal CoutCstrNL			
+			jal CoutCstrNL
 #			cout << dlStr << '\n';
 			addi $a0, $sp, 61
-			jal CoutCstrNL			
+			jal CoutCstrNL
 #			return 0;
 #}
 			# EPILOG:
@@ -119,31 +130,51 @@ hasDup:
 #################
 # Register usage:
 #################
-# ...
 # $v1: holder for a value/address
 ###############################################################################
 #                       **************************
 #                       ********** (27) **********
 #                       **************************
-			# PROLOG:					
-			
-#{			
+			# PROLOG:
+			addiu $sp, $sp, -32
+			sw $ra, 28($sp)
+			sw $fp, 24($sp)
+			addiu $fp, $sp, 32
+
+			sw $a0, 0($fp)					# arrBegPtr
+			sw $a1, 4($fp)					# mumEle
+
+#{
 			# BODY:
 
 #			if (numEle <= 1)
 #			{
 #			   return 0;
+				li $v1, 1
+				li $v0,0
+				blez $a1, $v1 main
 #			}
 
 #			if ( exists(arrBegPtr + 1, numEle - 1, *arrBegPtr) != 0 )
 #			{
 #			   return 1;
-#			}
+				addi $a0, $a0, 1 	# arrBegPtr + 1 as arg1
+				addi $a1, $a1, -1 # numEle - 1 as arg2
+				lw $a2, 0($fp) 	# arrBegPtr as arg3
+				jal exists
+				li $v0,1
+				bnez $v1, main
+				#			}
 
 #			return hasDup(arrBegPtr + 1, numEle -1);
+			addi $a0, $a0, 1 	# arrBegPtr + 1 as arg1
+			addi $a1, $a1, -1 # numEle - 1 as arg2
+			jal hasDup
 #}
 			# EPILOG:
-
+			lw $fp, 24($sp)
+			lw $ra, 28($sp)
+			addiu $sp, $sp, 32
 #########################################
 # deliberate clobbering of caller-saved
 # (meant to catch improper presumptions -
@@ -182,24 +213,42 @@ exists:
 #                       **************************
 #                       ********** (17) **********
 #                       **************************
-			# PROLOG:					
-			
+			# PROLOG:
+			addiu $sp, $sp, -32
+			sw $ra, 28($sp)
+			sw $fp, 24($sp)
+			addiu $fp, $sp, 32
+
+			sw $a0, 0($fp)					# arrBegPtr
+			sw $a1, 4($fp)					# mumEle
+			sw $a2, 8($fp)					# target
 #{
 			# BODY:
 #			if (numEle <= 0)
 #			{
 #			   return 0;
+				li $v0, 0
+				blez $a1, $t0 main
 #			}
 
 #			if (*arrBegPtr == target)
 #			{
+				li $v1, $a2
+				li $v0, 1
+				beq $a0, $v1, main
 #			   return 1;
 #			}
 #			return exists(arrBegPtr + 1, numEle - 1, target);
+			addi $a0, $a0, 1 	# arrBegPtr + 1 as arg1
+			addi $a1, $a1, -1 # numEle - 1 as arg2
+			lw $a2, 8($fp) 	# target as arg3
+			jal exists
 #}
 			# EPILOG:
-			
-			
+			lw $fp, 24($sp)
+			lw $ra, 28($sp)
+			addiu $sp, $sp, 32
+
 #########################################
 # deliberate clobbering of caller-saved
 # (meant to catch improper presumptions -
@@ -386,7 +435,7 @@ PopulateArray:
 			sw $ra, 116($sp)
 			sw $fp, 112($sp)
 			addiu $fp, $sp, 120
-	
+
 			sw $a1, 4($fp)					# usedPtr as received saved in caller's frame
 			sw $a2, 8($fp)					# cap as received saved in caller's frame
 			sw $s1, 16($sp)					# save $s1 (callee-saved)
@@ -425,7 +474,7 @@ begW2:
 			li $a0, ' '
 			syscall
 #			cin >> *hopPtr;
-			li $v0, 5			
+			li $v0, 5
 			syscall						# $v0 has user-entered int
 			sw $v0, 0($s1)					# $s1 is hopPtr
 #			++(*usedPtr);
@@ -486,7 +535,7 @@ xitW2:
 			lw $s1, 16($sp)					# restore $s1 (callee-saved)
 			lw $fp, 112($sp)
 			lw $ra, 116($sp)
-			addiu $sp, $sp, 120  
+			addiu $sp, $sp, 120
 #########################################
 # deliberate clobbering of caller-saved
 # (meant to catch improper presumptions -
@@ -604,10 +653,10 @@ ShowArrayLabeled:
 			sw $ra, 28($sp)
 			sw $fp, 24($sp)
 			addiu $fp, $sp, 32
-			
+
 			sw $a0, 0($fp)					# a as received saved in caller's frame
 			sw $a1, 4($fp)					# used as received saved in caller's frame
-#{			
+#{
 			# BODY:
 #			CoutCstr(label);
 			move $a0, $a2
@@ -616,12 +665,12 @@ ShowArrayLabeled:
 			lw $a0, 0($fp)					# a as received re-loaded into $a0
 			lw $a1, 4($fp)					# used as received re-loaded into $a1
 									# CoutCstr might have clobbered $a0 & $a1
-			jal ShowArray			
+			jal ShowArray
 #}
 			# EPILOG:
 			lw $fp, 24($sp)
 			lw $ra, 28($sp)
-			addiu $sp, $sp, 32  
+			addiu $sp, $sp, 32
 #########################################
 # deliberate clobbering of caller-saved
 # (meant to catch improper presumptions -
