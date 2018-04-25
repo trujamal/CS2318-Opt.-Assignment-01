@@ -152,7 +152,7 @@ hasDup:
 #			   return 0;
 				li $v1, 1
 				li $v0,0
-				blez $a1, $v1 main
+				blez $v1, main
 #			}
 
 #			if ( exists(arrBegPtr + 1, numEle - 1, *arrBegPtr) != 0 )
@@ -220,7 +220,7 @@ exists:
 			addiu $fp, $sp, 32
 
 			sw $a0, 0($fp)					# arrBegPtr
-			sw $a1, 4($fp)					# mumEle
+			sw $a1, 4($fp)					# numEle
 			sw $a2, 8($fp)					# target
 #{
 			# BODY:
@@ -228,12 +228,12 @@ exists:
 #			{
 #			   return 0;
 				li $v0, 0
-				blez $a1, $t0 main
+				blez $a1, main
 #			}
 
 #			if (*arrBegPtr == target)
 #			{
-				li $v1, $a2
+				sw $v1, 8($fp)
 				li $v0, 1
 				beq $a0, $v1, main
 #			   return 1;
