@@ -67,20 +67,20 @@ begW1:
 #			if ( hasDup(a1, used1) != 0 )
 #     if ( hasDup(a1, used1) == 0 ) goto else0;
 
-			addi $a0, $sp, 152
-			addi $a1, $sp, 149
-			beqz $t0, else0
+			addi $a0, $sp, 152 # Location of a1
+			lw $a1, 48($sp) # Location of used1
 			jal hasDup
+			beqz $v0, else0
 #			{
 #			   CoutCstrNL(dupsMsg);
-				addi $a0, $sp, 31
+				lw $a0, 31($sp)
 				jal CoutCstrNL
 #			}
 #			else
 else0:
 #			{
 #			   CoutCstrNL(dup0Msg);
-				addi $a0, $sp, 46
+				lw $a0, 46($sp)
 				jal CoutCstrNL
 #			}
 
@@ -125,6 +125,7 @@ xitW1:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #int  hasDup(int* arrBegPtr, int numEle)
+#									0($fp)         4($fp)
 ###############################################################################
 hasDup:
 #################
@@ -158,8 +159,9 @@ hasDup:
 #			if ( exists(arrBegPtr + 1, numEle - 1, *arrBegPtr) != 0 )
 #			{
 #			   return 1;
-				addi $a0, $a0, 1 	# arrBegPtr + 1 as arg1
-				addi $a1, $a1, -1 # numEle - 1 as arg2
+				addi $a0, $a0, 0 	# arrBegPtr + 1 as arg1
+				li $v1, 1
+				sub $a1, $a1, $v1  # numEle - 1 as arg2
 				lw $a2, 0($fp) 	# arrBegPtr as arg3
 				jal exists
 				li $v0,1
@@ -203,6 +205,7 @@ hasDup:
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++#
 #int  exists(int* arrBegPtr, int numEle, int target)
+#									0($fp)        4($fp)    8($fp)
 ###############################################################################
 exists:
 #################
@@ -218,32 +221,31 @@ exists:
 			sw $ra, 28($sp)
 			sw $fp, 24($sp)
 			addiu $fp, $sp, 32
-
-			sw $a0, 0($fp)					# arrBegPtr
-			sw $a1, 4($fp)					# numEle
-			sw $a2, 8($fp)					# target
 #{
 			# BODY:
 #			if (numEle <= 0)
 #			{
 #			   return 0;
 				li $v0, 0
-				blez $a1, main
+				jr $ra
 #			}
 
 #			if (*arrBegPtr == target)
 #			{
 				sw $v1, 8($fp)
 				li $v0, 1
-				beq $a0, $v1, main
+				jr $ra
 #			   return 1;
 #			}
 #			return exists(arrBegPtr + 1, numEle - 1, target);
-			addi $a0, $a0, 1 	# arrBegPtr + 1 as arg1
-			addi $a1, $a1, -1 # numEle - 1 as arg2
+			addi $a0, $a0, 0 	# arrBegPtr + 1 as arg1
+			li $v1, 1
+			sub $a1, $a1, $v1 # numEle - 1 as arg2
 			lw $a2, 8($fp) 	# target as arg3
 			jal exists
 #}
+
+
 			# EPILOG:
 			lw $fp, 24($sp)
 			lw $ra, 28($sp)
